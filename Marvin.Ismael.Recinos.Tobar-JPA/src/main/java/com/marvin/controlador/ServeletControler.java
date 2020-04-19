@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;import javax.xml.bind.ParseConversionEvent;
 
+import com.google.gson.Gson;
+import com.marvin.DAO.ClienteDAO;
 import com.marvin.model.Cliente;
 
 
@@ -32,33 +34,30 @@ public class ServeletControler extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		String acction=request.getParameter("btn");
-		EntityManager em;
-		EntityManagerFactory emf;
-		 
-		emf = Persistence.createEntityManagerFactory("Marvin.Ismael.Recinos.Tobar-JPA");
-		em = emf.createEntityManager();
 		Cliente cl = new Cliente();
-		try {
-     	String id= request.getParameter("Id");
-		String nombre = request.getParameter("Nombre");
-		String apellido = request.getParameter("Apellido");
-		String edad = request.getParameter("Edad");
-		String direccion = request.getParameter("Direccion");
-		String dui = request.getParameter("Dui");
-		String nit = request.getParameter("Nit");
-		String grupoDeClaseProgramacion3Alquepertenece = request.getParameter("grupoDeClaseProgramacion3Alquepertenece");
-		String ultimaNotaObtenidaEnProgramacion2 = request.getParameter("ultimaNotaObtenidaEnProgramacion2");
+		ClienteDAO cld = new ClienteDAO();
+		String id=null;
+		String nombre=null;
+		String apellido=null; 
+		String edad=null; 
+		String direccion=null;
+		String dui=null;
+		String nit=null; 
+		String grupoDeClaseProgramacion3Alquepertenece=null; 
+		String ultimaNotaObtenidaEnProgramacion2=null; 
 		
-		 
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+		try {
+		id= request.getParameter("Id");
+		nombre= request.getParameter("Nombre");
+		apellido= request.getParameter("Apellido");
+		edad= request.getParameter("Edad");
+		direccion= request.getParameter("Direccion");
+		dui= request.getParameter("Dui");
+		nit= request.getParameter("Nit");
+		grupoDeClaseProgramacion3Alquepertenece= request.getParameter("grupoDeClaseProgramacion3Alquepertenece");
+		ultimaNotaObtenidaEnProgramacion2= request.getParameter("ultimaNotaObtenidaEnProgramacion2");
+		
 		 cl.setId(Integer.parseInt(id));
 		 cl.setNombre(nombre);
 		 cl.setApellido(apellido);
@@ -69,42 +68,62 @@ public class ServeletControler extends HttpServlet {
 		 cl.setGrupoDeClaseProgramacion3Alquepertenece(Integer.parseInt(grupoDeClaseProgramacion3Alquepertenece));
 		 cl.setUtimaNotaObtenidaEnProgramacion2(Double.parseDouble(ultimaNotaObtenidaEnProgramacion2));
 		 
-		 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// TODO: handle exception
 		}
+		String acction=request.getParameter("btn");
 		
-		if(acction.contentEquals("AGREGAR")) {
-			
-			em.getTransaction().begin();
-	        em.persist(cl);
-			em.flush();
-			em.getTransaction().commit();
-				
-			
-		}else if(acction.equals("ELIMINAR")) {
-			
-		    
+		if(acction.equals("GUARDAR")) {	 
+		 cl.setId(Integer.parseInt(id));
+		 cl.setNombre(nombre);
+		 cl.setApellido(apellido);
+		 cl.setEdad(Integer.parseInt(edad));
+		 cl.setDireccion(direccion);	
+		 cl.setDui(dui);
+		 cl.setNit(nit);
+		 cl.setGrupoDeClaseProgramacion3Alquepertenece(Integer.parseInt(grupoDeClaseProgramacion3Alquepertenece));
+		 cl.setUtimaNotaObtenidaEnProgramacion2(Double.parseDouble(ultimaNotaObtenidaEnProgramacion2));
+		 	 
+		 cld.agregarDatos(cl);
+		 	 
+		 }
+		 else if(acction.equals("ACTUALIZAR")){
+			 cl.setId(Integer.parseInt(id));
+			 cl.setNombre(nombre);
+			 cl.setApellido(apellido);
+			 cl.setEdad(Integer.parseInt(edad));
+			 cl.setDireccion(direccion);	
+			 cl.setDui(dui);
+			 cl.setNit(nit);
+			 cl.setGrupoDeClaseProgramacion3Alquepertenece(Integer.parseInt(grupoDeClaseProgramacion3Alquepertenece));
+			 cl.setUtimaNotaObtenidaEnProgramacion2(Double.parseDouble(ultimaNotaObtenidaEnProgramacion2));
 		 
-		     cl = em.getReference(Cliente.class, cl.getId());
-		    em.getTransaction().begin();
-		     em.remove(cl);
-		  	 em.flush();
-		  	 em.getTransaction().commit();
+			 cld.actualizarDatos(cl);
+		 }else if(acction.equals("ELIMINAR")) {
+			 cl.setId(Integer.parseInt(id));
+			 cld.eliminarDatos(cl);
+		 }
+		 response.sendRedirect("index.jsp");
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		ClienteDAO cldao = new ClienteDAO();
+		
+	    Gson json = new Gson();
+	    
+	    try {
 			
-			
-			
-		}else if (acction.equals("MODIFICAR")) {
-			
-		  em.getTransaction().begin();  
-		  em.merge(cl);
-		  em.flush();
-		  em.getTransaction().commit();
-			
-			
-			
+	    	response.getWriter().append(json.toJson(cldao.clienteLista()));
+	    	
+		} catch (Exception e) {
+			System.out.println(e);
 		}
-		response.sendRedirect("index.jsp");
+		
 	}
 
 }
