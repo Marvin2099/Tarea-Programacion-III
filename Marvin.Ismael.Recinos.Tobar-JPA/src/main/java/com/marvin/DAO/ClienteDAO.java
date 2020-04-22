@@ -39,7 +39,7 @@ public class ClienteDAO {
 		EntityManager em;
 		EntityManagerFactory emf;
 		emf = Persistence.createEntityManagerFactory("Marvin.Ismael.Recinos.Tobar-JPA");
-		em = emf.createEntityManager();
+		em =emf.createEntityManager();
 		
 		em.getTransaction().begin();
         em.persist(cl);
